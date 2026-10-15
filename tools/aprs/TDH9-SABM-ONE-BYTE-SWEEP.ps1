@@ -194,10 +194,6 @@ if (cr.Status != GattCommunicationStatus.Success ||
 var tx = cr.Characteristics[0];
 
 Console.WriteLine();
-Console.WriteLine("Start direct AF02 receiver on RX; APRS ON.");
-Console.WriteLine("Press ENTER when ready.");
-Console.ReadLine();
-
 Directory.CreateDirectory(outputDir);
 string logPath = Path.Combine(outputDir, "TDH9-SABM-BYTE-SWEEP-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + ".csv");
 using var log = new StreamWriter(logPath, false, new UTF8Encoding(false));
@@ -232,8 +228,8 @@ for (int ax25Len = start; ax25Len <= end; ++ax25Len)
         string status = "BLE_ACCEPTED";
         try { await WriteFrame(tx, frame); }
         catch (Exception e) { status = "BLE_FAILED: " + e.Message; }
-        string csvHex = Hex(frame).Replace(""","""");
-        log.WriteLine($"{at},{test},{rep},{ax25Len},{extra},{frame.Length},{chunks},\"{marker}\",\"{csvHex}\",\"{status.Replace(""", """")}\"");
+        string csvHex = Hex(frame).Replace(" ", "");
+        log.WriteLine($"{at},{test},{rep},{ax25Len},{extra},{frame.Length},{chunks},{marker.Replace(' ', '_')},{csvHex},{status.Replace(',', ';')}");
         log.Flush();
         Console.WriteLine("  AF01: " + status);
         if (status != "BLE_ACCEPTED") {
